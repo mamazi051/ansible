@@ -1,0 +1,4 @@
+packages:
+  - nginx
+  
+domain: test.local
