@@ -1,2 +1,6 @@
 ---
+packages:
+  - nginx
+  
+domain: test.local
 # vars file for roles/nginx
