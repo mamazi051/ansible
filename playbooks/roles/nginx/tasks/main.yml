@@ -1,0 +1,27 @@
+---
+  - name: update apt
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+  - name: install nginx 
+    apt:
+      name: "{{packages}}"
+      state: latest
+  - name: start and enable Nginx Service
+    service:
+      name: nginx
+      state: started
+      enabled: yes
+  - name: copy nginx config
+    template:
+      src: site.conf.j2
+      dest: /etc/nginx/conf.d/mysitee.conf
+    notify: restart nginx service
+  - debug:
+      var: ansible_default_ipv4.address
+  - debug:
+      var: ansible_memtotal_mb
+  - debug:
+      var: ansible_date_time
+
+# tasks file for roles/nginx
