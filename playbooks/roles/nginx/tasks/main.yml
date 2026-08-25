@@ -6,6 +6,81 @@
   register: env_info
   changed_when: false
 
+- name: Show environment information
+  debug:
+    var: env_info.stdout
+
+- name: Configure CentOS 8 Vault repositories
+  copy:
+    dest: /etc/yum.repos.d/CentOS-Vault.repo
+    content: |
+      [BaseOS]
+      name=CentOS 8 BaseOS
+      baseurl=http://vault.centos.org/centos/8/BaseOS/$basearch/os/
+      enabled=1
+      gpgcheck=0
+
+      [AppStream]
+      name=CentOS 8 AppStream
+      baseurl=http://vault.centos.org/centos/8/AppStream/$basearch/os/
+      enabled=1
+      gpgcheck=0
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "8"
+
+- name: Disable old CentOS repositories
+  shell: |
+    for f in /etc/yum.repos.d/CentOS-*.repo; do
+      if [ "$f" != "/etc/yum.repos.d/CentOS-Vault.repo" ]; then
+        sed -i 's/^enabled=1/enabled=0/' "$f"
+      fi
+    done
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "8"
+
+- name: Clean yum cache
+  command: yum clean all
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "8"
+
+- name: Install nginx
+  package:
+    name: "{{ packages }}"
+    state: present
+
+- name: Start and enable Nginx Service
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Copy nginx config
+  template:
+    src: site.conf.j2
+    dest: /etc/nginx/conf.d/mysitee.conf
+  notify: restart nginx service
+
+- name: Show IP address
+  debug:
+    var: ansible_default_ipv4.address
+
+- name: Show memory
+  debug:
+    var: ansible_memtotal_mb
+
+- name: Show date and time
+  debug:
+    var: ansible_date_time---
+- name: Show execution environment
+  shell: |
+    hostname
+    cat /etc/os-release
+  register: env_info
+  changed_when: false
+
 - debug:
     var: env_info.stdout
     
