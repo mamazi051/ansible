@@ -3,16 +3,18 @@
     package:
       name: "{{packages}}"
       state: present
+
   - name: copy nginx config
     template:
       src: site.conf.j2
       dest: /etc/nginx/conf.d/mysitee.conf
-    notify: restart nginx service
+
   - debug:
       var: ansible_default_ipv4.address
+
   - debug:
       var: ansible_memtotal_mb
+
   - debug:
       var: ansible_date_time
 
-# tasks file for roles/nginx
