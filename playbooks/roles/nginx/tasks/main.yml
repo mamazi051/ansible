@@ -1,4 +1,14 @@
 ---
+- name: Show execution environment
+  shell: |
+    hostname
+    cat /etc/os-release
+  register: env_info
+  changed_when: false
+
+- debug:
+    var: env_info.stdout
+    
 - name: Test DNS
   command: getent hosts vault.centos.org
   changed_when: false
