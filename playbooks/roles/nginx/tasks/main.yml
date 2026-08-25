@@ -1,4 +1,18 @@
 ---
+- name: Check target OS and DNS
+  shell: |
+    echo "=== OS ==="
+    cat /etc/os-release
+    echo "=== DNS ==="
+    cat /etc/resolv.conf
+    echo "=== RESOLVE ==="
+    getent hosts mirrorlist.centos.org
+  register: debug_info
+  changed_when: false
+
+- name: Show debug info
+  debug:
+    var: debug_info.stdout
   - name: install nginx 
     package:
       name: "{{packages}}"
