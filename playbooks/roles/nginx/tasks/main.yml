@@ -1,27 +1,8 @@
 ---
-- name: Check target OS and DNS
-  shell: |
-    echo "=== OS ==="
-    cat /etc/os-release
-    echo "=== DNS ==="
-    cat /etc/resolv.conf
-    echo "=== RESOLVE ==="
-    getent hosts mirrorlist.centos.org
-  register: debug_info
-  changed_when: false
-
-- name: Show debug info
-  debug:
-    var: debug_info.stdout
   - name: install nginx 
     package:
       name: "{{packages}}"
-      state: latest
-  - name: start and enable Nginx Service
-    service:
-      name: nginx
-      state: started
-      enabled: yes
+      state: present
   - name: copy nginx config
     template:
       src: site.conf.j2
