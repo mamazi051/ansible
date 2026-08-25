@@ -10,40 +10,38 @@
   when:
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "8"
-    
-  - name: Check target OS and DNS
-    shell: |
-      echo "=== OS ==="
-      cat /etc/os-release
-      echo "=== DNS ==="
-      cat /etc/resolv.conf
-      echo "=== RESOLVE ==="
-      getent hosts mirrorlist.centos.org
-    register: debug_info
-    changed_when: false
 
-  - name: Show debug info
-    debug:
-      var: debug_info.stdout
-  - name: install nginx 
-    package:
-      name: "{{packages}}"
-      state: latest
-  - name: start and enable Nginx Service
-    service:
-      name: nginx
-      state: started
-      enabled: yes
-  - name: copy nginx config
-    template:
-      src: site.conf.j2
-      dest: /etc/nginx/conf.d/mysitee.conf
-    notify: restart nginx service
-  - debug:
-      var: ansible_default_ipv4.address
-  - debug:
-      var: ansible_memtotal_mb
-  - debug:
-      var: ansible_date_time
+- name: Clean yum cache
+  command: yum clean all
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "8"
 
-# tasks file for roles/nginx
+- name: Install nginx
+  package:
+    name: "{{ packages }}"
+    state: latest
+
+- name: Start and enable Nginx Service
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Copy nginx config
+  template:
+    src: site.conf.j2
+    dest: /etc/nginx/conf.d/mysitee.conf
+  notify: restart nginx service
+
+- name: Show IP
+  debug:
+    var: ansible_default_ipv4.address
+
+- name: Show memory
+  debug:
+    var: ansible_memtotal_mb
+
+- name: Show date
+  debug:
+    var: ansible_date_time
