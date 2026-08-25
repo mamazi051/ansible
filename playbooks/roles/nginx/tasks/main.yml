@@ -1,4 +1,16 @@
 ---
+- name: Test DNS
+  command: getent hosts vault.centos.org
+  changed_when: false
+
+- name: Fix CentOS 8 repositories
+  shell: |
+    sed -i 's|^mirrorlist=|#mirrorlist=|g' /etc/yum.repos.d/CentOS-*.repo
+    sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "8"
+    
   - name: Check target OS and DNS
     shell: |
       echo "=== OS ==="
